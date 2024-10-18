@@ -1,8 +1,7 @@
 use std::{env, fs};
-use clap::{Parser, Subcommand};
 
 fn main() {
-    let args = Args::parse();
+    let args: Vec<String> = env::args().collect();
 
     if args.len() <= 1 {
         list_dir(".");
@@ -24,10 +23,4 @@ fn list_dir(direc: &str) {
         }
         Err(e) => eprintln!("Error: {}", e),
     }
-}
-
-#[derive(Parser)]
-struct Args {
-    #[clap(long, default_value = ".")]
-    path: String,
 }
