@@ -1,13 +1,21 @@
-use std::{env, fs};
+use walkdir::WalkDir;
+use std::fs;
+use clap::Parser;
+
+
+#[derive(Parser)]
+struct Cli {
+    #[arg(short, long, help = "list recursively", action = clap::ArgAction::Count)]
+    recursive: u8,
+    #[arg(default_value = ".")]
+    file_path: String,
+}
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-
-    if args.len() <= 1 {
-        list_dir(".");
-    }
-    else {
-        list_dir(args[1].as_str());
+    let cli = Cli::parse();
+    match cli.recursive {
+        0 => list_dir(&cli.file_path),
+        _ => list_recursive(&cli.file_path),
     }
 }
 
@@ -22,5 +30,14 @@ fn list_dir(direc: &str) {
             }
         }
         Err(e) => eprintln!("Error: {}", e),
+    }
+}
+
+fn list_recursive(direc: &str) {
+    for entry in WalkDir::new(direc) {
+        match entry {
+            Ok(entry) => println!("{}", entry.path().display()),
+            Err(e) => eprintln!("Error: {}", e),
+        }
     }
 }
